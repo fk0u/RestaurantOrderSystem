@@ -313,7 +313,7 @@ export default function CartPage() {
             </div>
 
             {/* Summary & Checkout Sticky */}
-            <div className="bg-white/90 backdrop-blur-xl p-6 rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] fixed bottom-0 left-0 right-0 z-40 pb-10 md:pb-safe border-t border-gray-100">
+            <div className="bg-white/90 backdrop-blur-xl p-6 rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] fixed bottom-0 left-0 right-0 z-40 pb-32 md:pb-safe border-t border-gray-100">
                 <div className="mx-auto max-w-2xl space-y-3 mb-6">
                     <div className="flex justify-between text-sm text-gray-500">
                         <span>Subtotal</span>
