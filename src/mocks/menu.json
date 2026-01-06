@@ -1,0 +1,202 @@
+[
+    {
+        "id": 1,
+        "name": "Nasi Goreng Spesial",
+        "price": 35000,
+        "description": "Nasi goreng dengan bumbu rahasia, dilengkapi ayam suwir, sate ayam, telur mata sapi, dan kerupuk udang.",
+        "image": "https://images.unsplash.com/photo-1603133872878-684f10842619?auto=format&fit=crop&q=80&w=1000",
+        "category": "Makanan Berat",
+        "stock": 50,
+        "popular": true
+    },
+    {
+        "id": 2,
+        "name": "Sate Ayam Madura",
+        "price": 30000,
+        "description": "Sate ayam dengan bumbu kacang kental khas Madura, disajikan dengan lontong dan irisan bawang merah.",
+        "image": "https://images.unsplash.com/photo-1630400588835-f76c9adce507?auto=format&fit=crop&q=80&w=1000",
+        "category": "Makanan Berat",
+        "stock": 40,
+        "popular": true
+    },
+    {
+        "id": 3,
+        "name": "Rendang Daging",
+        "price": 45000,
+        "description": "Daging sapi pilihan dimasak perlahan dengan rempah-rempah asli Padang hingga meresap sempurna.",
+        "image": "https://images.unsplash.com/photo-1627050013093-4a6c6248ceac?auto=format&fit=crop&q=80&w=1000",
+        "category": "Makanan Berat",
+        "stock": 25,
+        "popular": true
+    },
+    {
+        "id": 4,
+        "name": "Mie Goreng Jawa",
+        "price": 28000,
+        "description": "Mie telor dimasak dengan bumbu kemiri khas Jawa, suwiran ayam kampung, dan taburan bawang goreng.",
+        "image": "https://images.unsplash.com/photo-1610450949162-8ceb115667d8?auto=format&fit=crop&q=80&w=1000",
+        "category": "Makanan Berat",
+        "stock": 35,
+        "popular": false
+    },
+    {
+        "id": 5,
+        "name": "Ayam Bakar Taliwang",
+        "price": 42000,
+        "description": "Ayam kampung muda dibakar dengan bumbu pedas gurih khas Lombok, disajikan dengan plecing kangkung.",
+        "image": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&q=80&w=1000",
+        "category": "Makanan Berat",
+        "stock": 20,
+        "popular": false
+    },
+    {
+        "id": 6,
+        "name": "Es Teh Manis Jumbo",
+        "price": 8000,
+        "description": "Teh melati pilihan diseduh segar, disajikan dingin dalam gelas jumbo. Bisa request tingkat manis.",
+        "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&q=80&w=1000",
+        "category": "Minuman",
+        "stock": 100,
+        "popular": true
+    },
+    {
+        "id": 7,
+        "name": "Kopi Susu Gula Aren",
+        "price": 18000,
+        "description": "Espresso blend house, susu segar, dan gula aren organik. Creamy dan legit.",
+        "image": "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=1000",
+        "category": "Minuman",
+        "stock": 60,
+        "popular": true
+    },
+    {
+        "id": 8,
+        "name": "Jus Alpukat",
+        "price": 22000,
+        "description": "Alpukat mentega pilihan diblend kental, ditambah susu kental manis coklat.",
+        "image": "https://images.unsplash.com/photo-1601039641847-7857b994d704?auto=format&fit=crop&q=80&w=1000",
+        "category": "Minuman",
+        "stock": 30,
+        "popular": false
+    },
+    {
+        "id": 9,
+        "name": "Es Jeruk Murni",
+        "price": 15000,
+        "description": "Perasan jeruk Pontianak asli, segar dan kaya vitamin C.",
+        "image": "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&q=80&w=1000",
+        "category": "Minuman",
+        "stock": 45,
+        "popular": false
+    },
+    {
+        "id": 10,
+        "name": "Wedang Jahe",
+        "price": 12000,
+        "description": "Minuman hangat sari jahe merah, serai, dan gula batu. Cocok untuk menghangatkan badan.",
+        "image": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&q=80&w=1000",
+        "category": "Minuman",
+        "stock": 50,
+        "popular": false
+    },
+    {
+        "id": 11,
+        "name": "Pisang Goreng Keju",
+        "price": 20000,
+        "description": "Pisang kepok kuning digoreng crispy, ditaburi keju cheddar parut dan susu kental manis.",
+        "image": "https://images.unsplash.com/photo-1517244683847-745431f57235?auto=format&fit=crop&q=80&w=1000",
+        "category": "Cemilan",
+        "stock": 25,
+        "popular": true
+    },
+    {
+        "id": 12,
+        "name": "Tahu Walik",
+        "price": 18000,
+        "description": "Tahu pong dibalik berisi adonan ayam dan udang, digoreng renyah. Disajikan dengan sambal kecap.",
+        "image": "https://plus.unsplash.com/premium_photo-1729431412037-abbf2105156a?auto=format&fit=crop&q=80&w=1000",
+        "category": "Cemilan",
+        "stock": 30,
+        "popular": false
+    },
+    {
+        "id": 13,
+        "name": "French Fries",
+        "price": 25000,
+        "description": "Kentang goreng potongan shoestring, gurih dan renyah.",
+        "image": "https://images.unsplash.com/photo-1518013431117-e5952c87455d?auto=format&fit=crop&q=80&w=1000",
+        "category": "Cemilan",
+        "stock": 50,
+        "popular": false
+    },
+    {
+        "id": 14,
+        "name": "Dimsum Ayam",
+        "price": 28000,
+        "description": "Siomay ayam udang kukus hangat, isi 4 pcs. Lembut dan padat dagingnya.",
+        "image": "https://images.unsplash.com/photo-1496116218417-1a781b1c423c?auto=format&fit=crop&q=80&w=1000",
+        "category": "Cemilan",
+        "stock": 30,
+        "popular": true
+    },
+    {
+        "id": 15,
+        "name": "Choco Lava Cake",
+        "price": 32000,
+        "description": "Kue coklat hangat dengan isian coklat lumer, disajikan dengan satu scoop es krim vanilla.",
+        "image": "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&q=80&w=1000",
+        "category": "Dessert",
+        "stock": 15,
+        "popular": true
+    },
+    {
+        "id": 16,
+        "name": "Es Teler Sultan",
+        "price": 28000,
+        "description": "Es teler dengan isian nangka, alpukat, kelapa muda, dan durian montong.",
+        "image": "https://images.unsplash.com/photo-1559563362-c667ba5f5480?auto=format&fit=crop&q=80&w=1000",
+        "category": "Dessert",
+        "stock": 20,
+        "popular": true
+    },
+    {
+        "id": 17,
+        "name": "Pudding Mangga",
+        "price": 18000,
+        "description": "Pudding sutra rasa mangga dengan vla creamy dan potongan mangga segar.",
+        "image": "https://images.unsplash.com/photo-1543364195-077a16c30ff3?auto=format&fit=crop&q=80&w=1000",
+        "category": "Dessert",
+        "stock": 25,
+        "popular": false
+    },
+    {
+        "id": 18,
+        "name": "Croffle Original",
+        "price": 22000,
+        "description": "Croissant waffle renyah diluar lembut didalam, dengan taburan gula aren.",
+        "image": "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80&w=1000",
+        "category": "Dessert",
+        "stock": 40,
+        "popular": false
+    },
+    {
+        "id": 19,
+        "name": "Mendoan Banyumas",
+        "price": 15000,
+        "description": "Tempe goreng tepung setengah matang khas Banyumas, gurih dan nagih.",
+        "image": "https://images.unsplash.com/photo-1625938144755-652e08e359b7?auto=format&fit=crop&q=80&w=1000",
+        "category": "Cemilan",
+        "stock": 60,
+        "popular": false
+    },
+    {
+        "id": 20,
+        "name": "Sop Buntut",
+        "price": 65000,
+        "description": "Sop buntut sapi pilihan dengan kuah kaldu bening yang kaya rempah, wortel, dan kentang.",
+        "image": "https://images.unsplash.com/photo-1594911772125-07fc7a2d8d80?auto=format&fit=crop&q=80&w=1000",
+        "category": "Makanan Berat",
+        "stock": 10,
+        "popular": true
+    }
+]

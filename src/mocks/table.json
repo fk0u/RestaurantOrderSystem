@@ -1,0 +1,98 @@
+[
+    {
+        "id": "t1",
+        "number": 1,
+        "capacity": 2,
+        "status": "available"
+    },
+    {
+        "id": "t2",
+        "number": 2,
+        "capacity": 2,
+        "status": "available"
+    },
+    {
+        "id": "t3",
+        "number": 3,
+        "capacity": 4,
+        "status": "occupied"
+    },
+    {
+        "id": "t4",
+        "number": 4,
+        "capacity": 4,
+        "status": "available"
+    },
+    {
+        "id": "t5",
+        "number": 5,
+        "capacity": 2,
+        "status": "available"
+    },
+    {
+        "id": "t6",
+        "number": 6,
+        "capacity": 4,
+        "status": "available"
+    },
+    {
+        "id": "t7",
+        "number": 7,
+        "capacity": 6,
+        "status": "occupied"
+    },
+    {
+        "id": "t8",
+        "number": 8,
+        "capacity": 4,
+        "status": "available"
+    },
+    {
+        "id": "t9",
+        "number": 9,
+        "capacity": 2,
+        "status": "available"
+    },
+    {
+        "id": "t10",
+        "number": 10,
+        "capacity": 2,
+        "status": "available"
+    },
+    {
+        "id": "t11",
+        "number": 11,
+        "capacity": 4,
+        "status": "available"
+    },
+    {
+        "id": "t12",
+        "number": 12,
+        "capacity": 8,
+        "status": "available"
+    },
+    {
+        "id": "t13",
+        "number": 13,
+        "capacity": 4,
+        "status": "available"
+    },
+    {
+        "id": "t14",
+        "number": 14,
+        "capacity": 4,
+        "status": "available"
+    },
+    {
+        "id": "t15",
+        "number": 15,
+        "capacity": 2,
+        "status": "occupied"
+    },
+    {
+        "id": "t16",
+        "number": 16,
+        "capacity": 2,
+        "status": "available"
+    }
+]
