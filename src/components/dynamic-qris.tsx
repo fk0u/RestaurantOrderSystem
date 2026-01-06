@@ -7,10 +7,20 @@ import { Loader2, RefreshCw, Download, Copy, Share2, Clock, AlertTriangle, Check
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { generateQrisString, QRIS_STATIC_PAYLOAD } from '@/lib/qris'
+import { createWorker } from 'tesseract.js'
+import { toast } from 'sonner'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog"
 
 interface DynamicQRISProps {
     amount: number
-    onRefresh?: () => void
+    onRefresh?: () => void // Kept name for compatibility, but acts as 'onConfirm'
 }
 
 export function DynamicQRIS({ amount, onRefresh }: DynamicQRISProps) {
@@ -20,6 +30,16 @@ export function DynamicQRIS({ amount, onRefresh }: DynamicQRISProps) {
     const [error, setError] = useState<string | null>(null)
     const [timeLeft, setTimeLeft] = useState(900) // 15 minutes
     const canvasRef = useRef<HTMLCanvasElement>(null)
+
+    // OCR States
+    const [isVerifying, setIsVerifying] = useState(false)
+    const [isValidProof, setIsValidProof] = useState(false)
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    // Validation Error Modal State
+    const [validationError, setValidationError] = useState<{ title: string; message: string } | null>(null)
 
     // Countdown Timer
     useEffect(() => {
@@ -99,8 +119,97 @@ export function DynamicQRIS({ amount, onRefresh }: DynamicQRISProps) {
     const copyQRString = () => {
         if (qrData) {
             navigator.clipboard.writeText(qrData)
-            alert('Kode QRIS berhasil disalin!')
+            toast.success('Kode QRIS berhasil disalin!')
         }
+    }
+
+    const verifyPaymentProof = async (file: File) => {
+        setIsVerifying(true)
+        const toastId = toast.loading('Memverifikasi bukti pembayaran...')
+
+        try {
+            const worker = await createWorker('ind')
+            const { data: { text } } = await worker.recognize(file)
+            await worker.terminate()
+
+            const cleanText = text.toLowerCase()
+            console.log("OCR Result:", cleanText)
+
+            // 1. Verify Merchant (Strict)
+            const hasMerchant = cleanText.includes('kou') || cleanText.includes('digital') || cleanText.includes('kreatif')
+
+            // 2. Verify Amount (Strict)
+            const amountStr = amount.toString()
+            const formattedDot = amount.toLocaleString('id-ID').replace(/,/g, '.')
+            const formattedComma = amount.toLocaleString('en-US').replace(/,/g, ',')
+            const digitsOnly = cleanText.replace(/[^0-9\s]/g, '')
+
+            const hasAmount = cleanText.includes(amountStr) ||
+                cleanText.includes(formattedDot) ||
+                cleanText.includes(formattedComma) ||
+                digitsOnly.includes(amountStr)
+
+            if (!hasMerchant) {
+                throw new Error('Merchant invalid')
+            }
+
+            if (!hasAmount) {
+                throw new Error('Nominal invalid')
+            }
+
+            setIsValidProof(true)
+            toast.success('Bukti pembayaran valid!', { id: toastId })
+
+        } catch (error: any) {
+            console.error(error)
+            setIsValidProof(false)
+            toast.dismiss(toastId)
+
+            // Set specific error message for Modal
+            if (error.message === 'Merchant invalid') {
+                setValidationError({
+                    title: "Merchant Tidak Sesuai",
+                    message: "Bukti transfer tidak mentransfer ke Merchant yang benar (KOU Digital & Kreatif). Silahkan cek kembali."
+                })
+            } else if (error.message === 'Nominal invalid') {
+                setValidationError({
+                    title: "Nominal Salah",
+                    message: `Nominal yang terdeteksi tidak sesuai dengan total tagihan (Rp ${amount.toLocaleString('id-ID')}). Harap bayar sesuai tagihan.`
+                })
+            } else {
+                setValidationError({
+                    title: "Gagal Verifikasi",
+                    message: "Bukti pembayaran tidak dapat dibaca dengan jelas atau tidak valid. Pastikan foto terang dan jelas."
+                })
+            }
+        } finally {
+            setIsVerifying(false)
+        }
+    }
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            setSelectedFile(file)
+            setIsValidProof(false) // Reset valid status on new file
+            const url = URL.createObjectURL(file)
+            setPreviewUrl(url)
+
+            // Trigger Verification
+            verifyPaymentProof(file)
+        }
+    }
+
+    const handleConfirmPayment = () => {
+        if (!selectedFile) return
+        if (!isValidProof) {
+            toast.error('Gagal Konfirmasi', {
+                description: "Bukti pembayaran belum terverifikasi valid."
+            })
+            return
+        }
+        // Trigger parent callback if it exists, or just close
+        if (onRefresh) onRefresh()
     }
 
     return (
@@ -114,8 +223,8 @@ export function DynamicQRIS({ amount, onRefresh }: DynamicQRISProps) {
                 <p className="text-2xl font-black text-slate-900 mt-1">Rp {amount.toLocaleString('id-ID')}</p>
             </div>
 
-            {/* QR Area */}
-            <div className="relative w-64 h-64 bg-slate-50 rounded-3xl flex items-center justify-center border-2 border-slate-100 overflow-hidden mb-6">
+            {/* Content: QR or Upload Preview */}
+            <div className="relative w-64 h-64 bg-slate-50 rounded-3xl flex items-center justify-center border-2 border-slate-100 overflow-hidden mb-6 group">
                 {loading && (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -127,7 +236,7 @@ export function DynamicQRIS({ amount, onRefresh }: DynamicQRISProps) {
                     </motion.div>
                 )}
 
-                {timeLeft === 0 && !loading && (
+                {timeLeft === 0 && !loading && !previewUrl && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-md z-20 p-4 text-center">
                         <AlertTriangle className="w-10 h-10 text-orange-500 mb-2" />
                         <p className="font-bold text-slate-800">QR Code Kedaluwarsa</p>
@@ -138,44 +247,118 @@ export function DynamicQRIS({ amount, onRefresh }: DynamicQRISProps) {
                     </div>
                 )}
 
-                {error && !loading && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-50 z-20 p-4 text-center">
-                        <AlertTriangle className="w-10 h-10 text-red-500 mb-2" />
-                        <p className="font-bold text-red-600 text-sm">{error}</p>
-                        <Button onClick={generateQRIS} size="sm" variant="outline" className="mt-4 border-red-200 text-red-600">
-                            Coba Lagi
-                        </Button>
+                {/* Proof Preview */}
+                {previewUrl ? (
+                    <div className="absolute inset-0 z-30 bg-black">
+                        <img src={previewUrl} alt="Bukti Transfer" className="w-full h-full object-contain" />
+                        <button
+                            onClick={() => {
+                                setPreviewUrl(null)
+                                setSelectedFile(null)
+                            }}
+                            className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full hover:bg-red-500 transition-colors"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                        </button>
                     </div>
+                ) : (
+                    <canvas ref={canvasRef} className={cn("w-full h-full object-contain p-2", (loading || timeLeft === 0 || error) ? "opacity-20" : "opacity-100")} />
                 )}
-
-                <canvas ref={canvasRef} className={cn("w-full h-full object-contain p-2", (loading || timeLeft === 0 || error) ? "opacity-20" : "opacity-100")} />
             </div>
 
             {/* Timer & Merchant */}
-            <div className="w-full space-y-4">
-                <div className={cn("flex items-center justify-center gap-2 py-2 rounded-xl transition-colors", timeLeft < 60 ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600")}>
-                    <Clock className="w-4 h-4" />
-                    <span className="font-mono font-bold text-lg">{formatTime(timeLeft)}</span>
-                </div>
+            {!previewUrl && (
+                <div className="w-full space-y-4 mb-6">
+                    <div className={cn("flex items-center justify-center gap-2 py-2 rounded-xl transition-colors", timeLeft < 60 ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-600")}>
+                        <Clock className="w-4 h-4" />
+                        <span className="font-mono font-bold text-lg">{formatTime(timeLeft)}</span>
+                    </div>
 
-                {merchantName && (
-                    <p className="text-center text-xs text-slate-400">
-                        Merchant: <span className="font-bold text-slate-600">{merchantName}</span>
-                    </p>
+                    {merchantName && (
+                        <p className="text-center text-xs text-slate-400">
+                            Merchant: <span className="font-bold text-slate-600">{merchantName}</span>
+                        </p>
+                    )}
+                </div>
+            )}
+
+            {/* Actions: Upload & Confirm */}
+            <div className="w-full space-y-3">
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                />
+
+                {!previewUrl ? (
+                    <Button
+                        variant="outline"
+                        className="w-full h-12 border-dashed border-2 border-slate-300 text-slate-500 hover:border-orange-500 hover:text-orange-500 hover:bg-orange-50"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Upload Bukti Transfer
+                    </Button>
+                ) : (
+                    <Button
+                        className={cn(
+                            "w-full h-12 font-bold transition-all",
+                            isValidProof ? "bg-green-500 hover:bg-green-600 text-white" : "bg-slate-300 text-slate-500 cursor-not-allowed"
+                        )}
+                        onClick={handleConfirmPayment}
+                        disabled={isVerifying || !isValidProof}
+                    >
+                        {isVerifying ? (
+                            <>
+                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                Memeriksa...
+                            </>
+                        ) : isValidProof ? (
+                            <>
+                                <CheckCircle className="w-5 h-5 mr-2" />
+                                Konfirmasi Pembayaran
+                            </>
+                        ) : (
+                            "Bukti Tidak Valid"
+                        )}
+                    </Button>
                 )}
 
-                {/* Actions */}
-                <div className="grid grid-cols-2 gap-2 mt-4">
-                    <Button variant="outline" className="h-10 text-xs" onClick={downloadQR} disabled={!qrData || loading}>
-                        <Download className="w-3.5 h-3.5 mr-2" />
-                        Simpan
-                    </Button>
-                    <Button variant="outline" className="h-10 text-xs" onClick={copyQRString} disabled={!qrData || loading}>
-                        <Copy className="w-3.5 h-3.5 mr-2" />
-                        Salin
-                    </Button>
-                </div>
+                {!previewUrl && (
+                    <div className="grid grid-cols-2 gap-2">
+                        <Button variant="ghost" className="h-10 text-xs text-slate-400" onClick={downloadQR} disabled={!qrData || loading}>
+                            <Download className="w-3.5 h-3.5 mr-2" />
+                            Simpan QR
+                        </Button>
+                        <Button variant="ghost" className="h-10 text-xs text-slate-400" onClick={copyQRString} disabled={!qrData || loading}>
+                            <Copy className="w-3.5 h-3.5 mr-2" />
+                            Salin Kode
+                        </Button>
+                    </div>
+                )}
             </div>
+
+            {/* Error Logic Modal */}
+            <Dialog open={!!validationError} onOpenChange={(open) => !open && setValidationError(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="text-red-600 flex items-center gap-2">
+                            <AlertTriangle className="w-5 h-5" />
+                            {validationError?.title}
+                        </DialogTitle>
+                        <DialogDescription className="pt-2 text-slate-700 font-medium">
+                            {validationError?.message}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button onClick={() => setValidationError(null)} variant="secondary" className="w-full sm:w-auto">
+                            Coba Lagi
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

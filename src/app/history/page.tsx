@@ -1,9 +1,11 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useStore } from '@/lib/store'
-import { Clock, ShoppingBag, Receipt } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Clock, Receipt, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 interface OrderItem {
     name: string
@@ -74,7 +76,13 @@ export default function HistoryPage() {
                     </div>
                 ) : (
                     history.map((order, idx) => (
-                        <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-all">
+                        <div key={idx}
+                            className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 mb-6 cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden group"
+                            onClick={() => router.push(`/order/${order.id || ''}`)}
+                        >
+                            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ChevronRight className="w-5 h-5 text-slate-400" />
+                            </div>
                             <div className="flex justify-between items-start mb-4">
                                 <div>
                                     <p className="text-xs font-bold text-gray-400 mb-1">
