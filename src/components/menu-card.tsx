@@ -42,6 +42,7 @@ export function MenuCard({ item }: MenuCardProps) {
                         e.stopPropagation()
                         toggleWishlist(item.id)
                     }}
+                    aria-label={isWishlisted ? "Hapus dari wishlist" : "Tambah ke wishlist"}
                     className="absolute top-2 right-2 p-2 bg-white/50 backdrop-blur-md rounded-full shadow-sm hover:bg-white transition-colors z-10"
                 >
                     <Heart className={cn("w-4 h-4", isWishlisted ? "fill-red-500 text-red-500" : "text-gray-600")} />
@@ -59,14 +60,14 @@ export function MenuCard({ item }: MenuCardProps) {
             </div>
 
             <div className="p-3 flex flex-col flex-1 relative z-10">
-                <h3 className="font-bold text-gray-800 text-sm line-clamp-2 h-10">{item.name}</h3>
-                <p className="text-orange-600 font-extrabold text-sm mt-1">Rp {item.price.toLocaleString('id-ID')}</p>
+                <h3 className="font-bold text-gray-800 text-[10px] sm:text-xs line-clamp-2 h-7 leading-tight">{item.name}</h3>
+                <p className="text-orange-600 font-extrabold text-[10px] sm:text-xs mt-0.5">Rp {item.price.toLocaleString('id-ID')}</p>
 
-                <div className="mt-auto pt-3">
+                <div className="mt-auto pt-2">
                     <Button
                         size="sm"
                         className={cn(
-                            "w-full rounded-xl h-8 text-xs shadow-lg transition-all",
+                            "w-full rounded-xl h-7 text-[10px] shadow-lg transition-all",
                             item.stock === 0 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-slate-900 hover:bg-slate-800 text-white shadow-slate-900/20"
                         )}
                         onClick={() => item.stock > 0 && addToCart(item)}

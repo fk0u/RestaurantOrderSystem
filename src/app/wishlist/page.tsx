@@ -33,7 +33,8 @@ export default function WishlistPage() {
                 </h1>
             </div>
 
-            <div className="p-4 grid grid-cols-2 gap-4">
+            <div className="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+
                 {loading ? (
                     [...Array(4)].map((_, i) => <MenuCardSkeleton key={i} />)
                 ) : wishlistedItems.length > 0 ? (

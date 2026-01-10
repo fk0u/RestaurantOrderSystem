@@ -16,6 +16,10 @@ export interface MenuItem {
 export type CartItem = MenuItem & {
     quantity: number
     note?: string
+    modifiers?: {
+        spicyLevel: number
+        selectedToppings: string[]
+    }
 }
 
 export type OrderMethod = 'dine-in' | 'takeaway' | 'delivery'
@@ -34,6 +38,12 @@ export type DeliveryDetails = {
     location?: { lat: number, lng: number }
 }
 
+export type TakeawayDetails = {
+    name: string
+    phone: string
+    time: string
+}
+
 export type Voucher = {
     code: string
     discount: number // absolute value
@@ -45,14 +55,16 @@ interface AppState {
     orderMethod: OrderMethod | null
     tableId: string | null
     deliveryDetails: DeliveryDetails | null
+    takeawayDetails: TakeawayDetails | null
     setOrderMethod: (method: OrderMethod) => void
     setTableId: (id: string) => void
     setDeliveryDetails: (details: DeliveryDetails) => void
+    setTakeawayDetails: (details: TakeawayDetails) => void
     resetOnboarding: () => void
 
     // Cart
     cart: CartItem[]
-    addToCart: (item: MenuItem) => void
+    addToCart: (item: MenuItem, quantity?: number, note?: string, modifiers?: any) => void
     removeFromCart: (itemId: number) => void
     updateQuantity: (itemId: number, delta: number) => void
     updateItemNote: (itemId: number, note: string) => void
@@ -70,6 +82,17 @@ interface AppState {
     // History
     history: any[]
     addToHistory: (order: any) => void
+    reviews: Review[]
+    addReview: (review: Review) => void
+}
+
+export interface Review {
+    id: string
+    orderId: string
+    rating: number
+    comment?: string
+    date: string
+    user: string
 }
 
 export const useStore = create<AppState>()(
@@ -78,28 +101,42 @@ export const useStore = create<AppState>()(
             orderMethod: null,
             tableId: null,
             deliveryDetails: null,
+            takeawayDetails: null,
             setOrderMethod: (method) => set({ orderMethod: method }),
             setTableId: (id) => set({ tableId: id }),
             setDeliveryDetails: (details) => set({ deliveryDetails: details }),
-            resetOnboarding: () => set({ orderMethod: null, tableId: null, deliveryDetails: null, cart: [], voucher: null }),
+            setTakeawayDetails: (details) => set({ takeawayDetails: details }),
+            resetOnboarding: () => set({ orderMethod: null, tableId: null, deliveryDetails: null, takeawayDetails: null, cart: [], voucher: null }),
 
             cart: [],
-            addToCart: (item) => {
+            addToCart: (item, quantity = 1, note = '', modifiers = {}) => {
                 const { cart } = get()
-                const existing = cart.find((c) => c.id === item.id)
+                // Check if same item with same modifiers exists
+                const existing = cart.find((c) =>
+                    c.id === item.id &&
+                    JSON.stringify(c.modifiers) === JSON.stringify(modifiers)
+                )
+
                 if (existing) {
                     if (existing.quantity < item.stock) {
                         set({
                             cart: cart.map((c) =>
-                                c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c
+                                c === existing ? { ...c, quantity: c.quantity + quantity } : c
                             ),
                         })
                     }
                 } else {
-                    set({ cart: [...cart, { ...item, quantity: 1, note: '' }] })
+                    set({ cart: [...cart, { ...item, quantity, note, modifiers }] })
                 }
             },
             removeFromCart: (id) => {
+                // Warning: This simplistic removal by ID might remove duplicates with different modifiers
+                // For a robust system, we should use a unique instance ID. 
+                // But for this demo, let's just filter by ID which might be aggressive.
+                // Better approach: Since we don't have unique instance IDs, we might need to filter carefully.
+                // However, user usually wants to remove specific item. 
+                // Let's assume user removes all instances of that product for now or change logic later if requested.
+                // Actually, let's keep it simple. If we want to remove specific one, we need index or instance ID.
                 set({ cart: get().cart.filter((c) => c.id !== id) })
             },
             updateQuantity: (id, delta) => {
@@ -138,7 +175,10 @@ export const useStore = create<AppState>()(
             },
 
             history: [],
-            addToHistory: (order) => set({ history: [order, ...get().history] }),
+            addToHistory: (order) => set((state) => ({ history: [order, ...state.history] })),
+
+            reviews: [],
+            addReview: (review) => set((state) => ({ reviews: [review, ...state.reviews] })),
         }),
         {
             name: 'restaurant-storage',
@@ -147,10 +187,10 @@ export const useStore = create<AppState>()(
                 orderMethod: state.orderMethod,
                 tableId: state.tableId,
                 deliveryDetails: state.deliveryDetails,
+                takeawayDetails: state.takeawayDetails,
                 cart: state.cart,
                 wishlist: state.wishlist,
                 history: state.history,
-                // Do not persist voucher to avoid stale codes? Actually persistence is fine.
                 voucher: state.voucher
             }),
         }

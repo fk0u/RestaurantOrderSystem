@@ -1,31 +1,16 @@
-import type { Metadata, Viewport } from "next";
-import { Inter as FontSans } from "next/font/google";
+import type { Metadata } from "next";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import { DockNav } from "@/components/dock-nav";
-import { FabCart } from "@/components/fab-cart";
-import { Toaster } from "@/components/ui/sonner"
+import { SidebarNav } from "@/components/sidebar-nav";
+import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: "#0f172a", // Darker theme color for mobile bar
-};
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "RestoApp - Mobile First",
-  description: "Modern Ordering System",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-  },
+  title: "Platter - Restaurant Order System",
+  description: "Pengalaman pesan makan masa depan.",
 };
 
 export default function RootLayout({
@@ -34,25 +19,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="h-full">
-      <body className={cn(
-        "min-h-full bg-slate-50 font-sans antialiased selection:bg-orange-500 selection:text-white",
-        fontSans.variable
-      )}>
-        {/* Desktop Background Ambience */}
-        <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-slate-100/50">
-          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-400/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-orange-400/10 rounded-full blur-[120px]" />
-        </div>
-
-        <div className="relative min-h-screen flex flex-col max-w-screen-xl mx-auto shadow-sm bg-white border-x border-slate-100">
-          <main className="flex-1 w-full relative pb-32">
+    <html lang="id">
+      <body className={cn("min-h-screen bg-slate-50 font-sans antialiased", outfit.variable)}>
+        <div className="flex min-h-screen">
+          <SidebarNav />
+          <main className="flex-1 md:ml-64 w-full transition-all relative pb-24 md:pb-0">
             {children}
           </main>
 
-          <div className="block md:hidden">
-            <FabCart />
-          </div>
+
 
           <DockNav />
         </div>

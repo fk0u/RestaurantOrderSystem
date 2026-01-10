@@ -214,9 +214,21 @@ export default function CartPage() {
 
                                         <div className="flex justify-between items-center">
                                             <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-2 py-1">
-                                                <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center bg-white rounded-lg shadow-sm text-slate-600"><Minus className="w-3 h-3" /></button>
+                                                <button
+                                                    aria-label="Kurangi jumlah"
+                                                    onClick={() => updateQuantity(item.id, -1)}
+                                                    className="w-6 h-6 flex items-center justify-center bg-white rounded-lg shadow-sm text-slate-600"
+                                                >
+                                                    <Minus className="w-3 h-3" />
+                                                </button>
                                                 <span className="font-bold text-sm w-4 text-center">{item.quantity}</span>
-                                                <button onClick={() => { if (item.quantity < item.stock) updateQuantity(item.id, 1) }} className="w-6 h-6 flex items-center justify-center bg-slate-800 text-white rounded-lg shadow-sm"><Plus className="w-3 h-3" /></button>
+                                                <button
+                                                    aria-label="Tambah jumlah"
+                                                    onClick={() => { if (item.quantity < item.stock) updateQuantity(item.id, 1) }}
+                                                    className="w-6 h-6 flex items-center justify-center bg-slate-800 text-white rounded-lg shadow-sm"
+                                                >
+                                                    <Plus className="w-3 h-3" />
+                                                </button>
                                             </div>
                                             <Button variant="ghost" size="icon" onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-600 h-8 w-8"><Trash2 className="w-4 h-4" /></Button>
                                         </div>
@@ -313,7 +325,8 @@ export default function CartPage() {
             </div>
 
             {/* Summary & Checkout Sticky */}
-            <div className="bg-white/90 backdrop-blur-xl p-6 rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] fixed bottom-0 left-0 right-0 z-40 pb-32 md:pb-safe border-t border-gray-100">
+            {/* Added bottom-20 for mobile to sit above DockNav (h-16 + padding), md:bottom-0 for desktop */}
+            <div className="bg-white/90 backdrop-blur-xl p-6 rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] fixed bottom-20 md:bottom-0 left-0 right-0 z-40 pb-6 md:pb-safe border-t border-gray-100">
                 <div className="mx-auto max-w-2xl space-y-3 mb-6">
                     <div className="flex justify-between text-sm text-gray-500">
                         <span>Subtotal</span>
@@ -347,7 +360,7 @@ export default function CartPage() {
                 <Dialog open={isPaymentOpen} onOpenChange={setIsPaymentOpen}>
                     <DialogTrigger asChild>
                         <Button
-                            className="w-full h-14 rounded-2xl text-lg font-bold bg-gradient-to-r from-orange-500 to-pink-500 shadow-xl shadow-orange-500/20 hover:scale-[1.02] transition-transform"
+                            className="w-full h-12 rounded-2xl text-base font-bold bg-gradient-to-r from-orange-500 to-pink-500 shadow-xl shadow-orange-500/20 hover:scale-[1.02] transition-transform"
                             onClick={(e) => {
                                 if (!validateDelivery()) e.preventDefault()
                             }}

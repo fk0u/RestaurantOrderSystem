@@ -1,22 +1,29 @@
+
 'use client'
 import { useEffect, useState } from 'react'
 import { MenuCard } from '@/components/menu-card'
 import { MenuRow } from '@/components/menu-row'
 import { MenuSliderItem } from '@/components/menu-slider-item'
 import { MenuCardSkeleton } from '@/components/skeleton-loader'
-import { MenuItem } from '@/lib/store'
+import { MenuItem, useStore } from '@/lib/store'
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
+import { ProductDetailModal } from '@/components/product-detail-modal'
+import { toast } from 'sonner' // Ensure sonner is installed/available
 
 export default function MenuPage() {
     const [menu, setMenu] = useState<MenuItem[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const [activeCategory, setActiveCategory] = useState('All')
-    // Ensure access to state if needed for debugging or logic, but components handle specific logic.
+
+    // Modal State
+    const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
+    const [detailOpen, setDetailOpen] = useState(false)
+
+    const { addToCart } = useStore()
 
     useEffect(() => {
         // Simulate network delay for skeleton demo
@@ -35,8 +42,27 @@ export default function MenuPage() {
         return matchSearch && matchCat
     })
 
+    const handleItemClick = (item: MenuItem) => {
+        setSelectedItem(item)
+        setDetailOpen(true)
+    }
+
+    const handleAddToCartFromModal = (item: MenuItem, quantity: number, note: string, modifiers: any) => {
+        addToCart(item, quantity, note, modifiers)
+        setDetailOpen(false)
+        setSelectedItem(null)
+        toast.success(`${quantity}x ${item.name} masuk keranjang! 🛒`)
+    }
+
     return (
         <div className="min-h-screen bg-slate-50 pb-32">
+            <ProductDetailModal
+                isOpen={detailOpen}
+                onClose={() => setDetailOpen(false)}
+                item={selectedItem}
+                onAddToCart={handleAddToCartFromModal}
+            />
+
             {/* Hero / Header */}
             <div className="bg-gradient-to-br from-indigo-900 via-primary to-rose-600 p-8 pt-16 rounded-b-[3rem] shadow-2xl text-white mb-8 relative overflow-hidden">
                 <div className="relative z-10 max-w-xl mx-auto text-center">
@@ -71,7 +97,7 @@ export default function MenuPage() {
             </div>
 
             {/* Categories Stick Header */}
-            <div className="sticky top-0 z-40 bg-slate-50/90 backdrop-blur-xl py-2 mb-4">
+            <div className="sticky top-0 z-40 bg-slate-50/90 backdrop-blur-xl py-2 mb-4 transition-all border-b border-transparent data-[stuck=true]:border-slate-200">
                 <div className="flex gap-2 overflow-x-auto px-6 [&::-webkit-scrollbar]:hidden no-scrollbar snap-x mx-auto max-w-4xl py-2">
                     <AnimatePresence mode="popLayout">
                         {loading ? (
@@ -122,16 +148,22 @@ export default function MenuPage() {
                                 initial={{ opacity: 0, x: 50 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: idx * 0.1 }}
+                                onClick={() => handleItemClick(item)}
                             >
-                                <MenuSliderItem item={item} />
+                                {/* Pass a readonly prop or something if we want slider to not auto-add, or just handle click globally. 
+                                    Assuming MenuSliderItem exposes click or we wrap it in a div that handles click 
+                                */}
+                                <div className="pointer-events-none">
+                                    <MenuSliderItem item={item} />
+                                </div>
                             </motion.div>
                         ))}
                     </div>
                 </div>
             )}
 
-            {/* Main List (Rows) */}
-            <div className="px-4 pb-32 mx-auto max-w-3xl">
+            {/* Main List (Grid) */}
+            <div className="px-4 pb-32 mx-auto max-w-7xl">
                 <div className="flex items-center justify-between mb-4 px-2">
                     <h2 className="text-lg font-bold text-slate-700">
                         {search ? `Searching "${search}"` : 'Daftar Menu'}
@@ -139,7 +171,7 @@ export default function MenuPage() {
                     <span className="text-xs font-medium text-slate-400">{filtered.length} items</span>
                 </div>
 
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {loading ? (
                         [...Array(6)].map((_, i) => <MenuCardSkeleton key={i} />)
                     ) : (
@@ -149,8 +181,18 @@ export default function MenuPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 + (idx * 0.05) }}
+                                onClick={() => handleItemClick(item)}
+                                className="cursor-pointer"
                             >
-                                <MenuRow item={item} />
+                                <div className="pointer-events-none md:pointer-events-auto h-full">
+                                    {/* Use Card on Desktop, Row on Mobile if desired, but Grid implies Card usually. 
+                                        Let's stick to MenuCard for grid view or responsive component. 
+                                        If we want Row on mobile and Card on desktop, we can use CSS. 
+                                        For simplicity & "Premium" feel, Cards in a grid are usually better for visual browsing.
+                                        Swapping MenuRow for MenuCard for consistency in grid.
+                                    */}
+                                    <MenuCard item={item} />
+                                </div>
                             </motion.div>
                         ))
                     )}
